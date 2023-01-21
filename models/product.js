@@ -27,7 +27,7 @@ module.exports = class Product {
     });
   }
 
-  static fetchAll() {
+  static fetchAll(callback) {
     const dataFilePath = path.join(
       path.dirname(require.main.filename),
       "data",
@@ -36,9 +36,12 @@ module.exports = class Product {
 
     fs.readFile(dataFilePath, (error, data) => {
       if (error) {
-        return [];
+        callback([]);
       }
-      return JSON.parse(data);
+      callback(JSON.parse(data));
     });
+
+    // const data = fs.readFileSync(dataFilePath);
+    // return JSON.parse(data);
   }
 };
