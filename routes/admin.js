@@ -15,11 +15,11 @@ router.get("/add-product", adminController.getAddProduct);
 router.post("/add-product", adminController.postAddProduct);
 
 // /admin/products => GET
-router.get("/products", (req, res, next) => {
-  res.render("admin/view-product-admin", {
-    pageTitle: "admin products",
-    path: "admin/products",
-  });
+router.get("/products", adminController.getProducts);
+
+// /admin/delete-product => POST
+router.post("/delete-product", (req, res, next) => {
+  console.log("delete btn clicked");
 });
 
 exports.routes = router;
