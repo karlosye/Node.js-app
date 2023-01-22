@@ -11,7 +11,12 @@ const router = express.Router();
 
 router.get("/", shopController.getIndex);
 router.get("/products", shopController.getProducts);
+
+// path/products/productId
+router.get("/products/:productId", shopController.getProductDetail);
+
 router.get("/cart", shopController.getCart);
+router.post("/cart", shopController.postItemToCart);
 router.get("/checkout", shopController.getCheckout);
 router.get("/orders", shopController.getOrders);
 

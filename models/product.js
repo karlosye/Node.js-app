@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { promisify } = require("util");
 
 module.exports = class Product {
   constructor(title, imageUrl, description, price) {
@@ -10,6 +11,7 @@ module.exports = class Product {
   }
 
   save() {
+    this.id = Math.random().toString();
     const dataFilePath = path.join(
       path.dirname(require.main.filename),
       "data",
@@ -46,5 +48,26 @@ module.exports = class Product {
 
     // const data = fs.readFileSync(dataFilePath);
     // return JSON.parse(data);
+  }
+
+  static async findById(id) {
+    const dataFilePath = path.join(
+      path.dirname(require.main.filename),
+      "data",
+      "products.json"
+    );
+
+    const readFileAsync = promisify(fs.readFile);
+
+    try {
+      const products = JSON.parse(await readFileAsync(dataFilePath));
+      const product = products.find((item) => {
+        return item.id === id;
+      });
+
+      return product;
+    } catch (error) {
+      return {};
+    }
   }
 };
