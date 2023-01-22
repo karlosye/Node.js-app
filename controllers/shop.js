@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const Cart = require("../models/cart");
 
 module.exports.getIndex = (req, res, next) => {
   Product.fetchAll((products) => {
@@ -36,9 +37,15 @@ module.exports.getCart = (req, res, next) => {
   res.render("shop/cart", { pageTitle: "Your Cart", path: "/cart" });
 };
 
-module.exports.postItemToCart = (req, res, next) => {
+module.exports.postItemToCart = async (req, res, next) => {
   const productId = req.body.productId;
   console.log(req.body.productId);
+
+  const findProduct = await Product.findById(productId);
+  const productPrice = parseFloat(findProduct.price);
+
+  Cart.addToCart(productId, productPrice);
+
   res.redirect("/cart");
 };
 

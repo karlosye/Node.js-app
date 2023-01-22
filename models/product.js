@@ -62,7 +62,7 @@ module.exports = class Product {
     try {
       const products = JSON.parse(await readFileAsync(dataFilePath));
       const product = products.find((item) => {
-        return item.id === id;
+        return item.id == id;
       });
 
       return product;

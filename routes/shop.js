@@ -20,8 +20,6 @@ router.post("/cart", shopController.postItemToCart);
 router.get("/checkout", shopController.getCheckout);
 router.get("/orders", shopController.getOrders);
 
-router.post("/add-to-cart", (req, res, next) => {
-  console.log("add to cart...");
-});
+router.post("/add-to-cart", shopController.postItemToCart);
 
 module.exports = router;
