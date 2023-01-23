@@ -2,8 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
 
+const Cart = require("./cart");
+
 module.exports = class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(id, title, imageUrl, description, price) {
+    this.id = id;
     this.title = title;
     this.imageURL = imageUrl;
     this.description = description;
@@ -11,25 +14,44 @@ module.exports = class Product {
   }
 
   save() {
-    this.id = Math.random().toString();
     const dataFilePath = path.join(
       path.dirname(require.main.filename),
       "data",
       "products.json"
     );
+    // check if this product already exist:
+    if (!this.id) {
+      this.id = Math.random().toString();
 
-    fs.readFile(dataFilePath, (err, fileContent) => {
-      let products = [];
-      if (!err) {
-        products = JSON.parse(fileContent);
-        console.log(products);
-      }
-      products.push(this);
+      fs.readFile(dataFilePath, (err, fileContent) => {
+        let products = [];
+        if (!err) {
+          products = JSON.parse(fileContent);
+          console.log(products);
+        }
+        products.push(this);
 
-      fs.writeFile(dataFilePath, JSON.stringify(products), (error) => {
-        console.log(error);
+        fs.writeFile(dataFilePath, JSON.stringify(products), (error) => {
+          console.log(error);
+        });
       });
-    });
+    } else {
+      // find the item from the product array:
+      fs.readFile(dataFilePath, (err, fileContent) => {
+        let products = [];
+        if (!err) {
+          products = JSON.parse(fileContent);
+          const matchProductIndex = products.findIndex((item) => {
+            return item.id === this.id;
+          });
+          // update the array item:
+          products[matchProductIndex] = this;
+          fs.writeFile(dataFilePath, JSON.stringify(products), (error) => {
+            console.log(error);
+          });
+        }
+      });
+    }
   }
 
   static fetchAll(callback) {
@@ -69,5 +91,36 @@ module.exports = class Product {
     } catch (error) {
       return {};
     }
+  }
+
+  static deleteProduct(id) {
+    const dataFilePath = path.join(
+      path.dirname(require.main.filename),
+      "data",
+      "products.json"
+    );
+
+    fs.readFile(dataFilePath, (err, fileContent) => {
+      let products = [];
+      if (!err) {
+        products = JSON.parse(fileContent);
+
+        // find the require product:
+        const product = products.find((item) => {
+          return item.id === id;
+        });
+
+        const updatedProducts = products.filter((item) => {
+          return item.id !== id;
+        });
+
+        console.log(updatedProducts);
+        fs.writeFile(dataFilePath, JSON.stringify(updatedProducts), (error) => {
+          console.log(error);
+        });
+
+        Cart.deleteProduct(product.id, product.price);
+      }
+    });
   }
 };
