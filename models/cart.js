@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 // get the data file path:
-const dataFilePath = path.join(
+const cartDataFilePath = path.join(
   path.dirname(require.main.filename),
   "data",
   "cart.json"
@@ -14,7 +14,7 @@ module.exports = class Cart {
   // add a static method: add to cart
   static addToCart(id, price) {
     // fetch cart from JSON
-    fs.readFile(dataFilePath, (err, fileContent) => {
+    fs.readFile(cartDataFilePath, (err, fileContent) => {
       // format: [{id:,qty:}]
       let cart = { products: [], totalPrice: 0 };
 
@@ -37,22 +37,19 @@ module.exports = class Cart {
       cart.totalPrice += price;
 
       // write file:
-      fs.writeFile(dataFilePath, JSON.stringify(cart), (err) => {
+      fs.writeFile(cartDataFilePath, JSON.stringify(cart), (err) => {
         console.log(err);
       });
     });
   }
 
-  static deleteProduct(id, productPrice) {
-    fs.readFile(dataFilePath, (err, fileContent) => {
+  static deleteProductFromCart(id, productPrice) {
+    fs.readFile(cartDataFilePath, (err, fileContent) => {
       if (err) {
         return;
       }
 
-      const updatedCart = { ...fileContent };
-
-      console.log(updatedCart);
-      console.log(updatedCart.products);
+      const updatedCart = { ...JSON.parse(fileContent) };
 
       const matchProductIndex = updatedCart.products.findIndex((item) => {
         return item.id === id;
@@ -65,9 +62,16 @@ module.exports = class Cart {
       // update the product array:
       updatedCart.products = updatedCart.products.splice(matchProductIndex, 1);
 
-      fs.writeFile(dataFilePath, JSON.stringify(updatedCart), (err) => {
+      fs.writeFile(cartDataFilePath, JSON.stringify(updatedCart), (err) => {
         console.log(err);
       });
     });
+  }
+
+  static fetchCartItems() {
+    // read all data from cart:
+    const fileContentCart = fs.readFileSync(cartDataFilePath);
+    const cartData = JSON.parse(fileContentCart);
+    return cartData;
   }
 };

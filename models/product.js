@@ -119,7 +119,8 @@ module.exports = class Product {
           console.log(error);
         });
 
-        Cart.deleteProduct(product.id, product.price);
+        // issues with the code below:
+        Cart.deleteProductFromCart(product.id, product.price);
       }
     });
   }
