@@ -60,7 +60,10 @@ module.exports = class Cart {
         updatedCart.totalPrice -
         updatedCart.products[matchProductIndex].qty * parseFloat(productPrice);
       // update the product array:
-      updatedCart.products = updatedCart.products.splice(matchProductIndex, 1);
+      // updatedCart.products = updatedCart.products.splice(matchProductIndex, 1);
+      updatedCart.products = updatedCart.products.filter((item) => {
+        return item.id !== id;
+      });
 
       fs.writeFile(cartDataFilePath, JSON.stringify(updatedCart), (err) => {
         console.log(err);
