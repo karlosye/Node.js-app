@@ -16,10 +16,6 @@ app.use(express.static(path.join(__dirname, "public")));
 const adminRoute = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 
-db.execute("SELECT * FROM products").then((data) => {
-  console.log(data[0]);
-}); 
-
 app.use("/admin", adminRoute.routes);
 app.use(shopRoutes);
 
