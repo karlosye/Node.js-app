@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
 
+const db = require("../util/database");
+
 const Cart = require("./cart");
 
 module.exports = class Product {
@@ -14,83 +16,20 @@ module.exports = class Product {
   }
 
   save() {
-    const dataFilePath = path.join(
-      path.dirname(require.main.filename),
-      "data",
-      "products.json"
+    // return a promise from db.execute()
+    return db.execute(
+      "INSERT INTO products (title, price, description, imageURL) VALUES (?,?,?,?)",
+      [this.title, this.price, this.description, this.imageURL]
     );
-    // check if this product already exist:
-    if (!this.id) {
-      this.id = Math.random().toString();
-
-      fs.readFile(dataFilePath, (err, fileContent) => {
-        let products = [];
-        if (!err) {
-          products = JSON.parse(fileContent);
-          console.log(products);
-        }
-        products.push(this);
-
-        fs.writeFile(dataFilePath, JSON.stringify(products), (error) => {
-          console.log(error);
-        });
-      });
-    } else {
-      // find the item from the product array:
-      fs.readFile(dataFilePath, (err, fileContent) => {
-        let products = [];
-        if (!err) {
-          products = JSON.parse(fileContent);
-          const matchProductIndex = products.findIndex((item) => {
-            return item.id === this.id;
-          });
-          // update the array item:
-          products[matchProductIndex] = this;
-          fs.writeFile(dataFilePath, JSON.stringify(products), (error) => {
-            console.log(error);
-          });
-        }
-      });
-    }
   }
 
-  static fetchAll(callback) {
-    const dataFilePath = path.join(
-      path.dirname(require.main.filename),
-      "data",
-      "products.json"
-    );
-
-    fs.readFile(dataFilePath, (error, data) => {
-      if (error) {
-        callback([]);
-      }
-      callback(JSON.parse(data));
-    });
-
-    // const data = fs.readFileSync(dataFilePath);
-    // return JSON.parse(data);
+  static fetchAll() {
+    // this will return a promise
+    return db.execute("SELECT * FROM products");
   }
 
-  static async findById(id) {
-    const dataFilePath = path.join(
-      path.dirname(require.main.filename),
-      "data",
-      "products.json"
-    );
-
-    const readFileAsync = promisify(fs.readFile);
-
-    try {
-      const products = JSON.parse(await readFileAsync(dataFilePath));
-      const product = products.find((item) => {
-        return item.id == id;
-      });
-
-      return product;
-    } catch (error) {
-      return {};
-    }
+  static findById(id) {
+    return db.execute("SELECT * FROM products where products.id = ?", [id]);
   }
 
   static deleteProduct(id) {

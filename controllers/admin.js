@@ -60,16 +60,26 @@ module.exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const imageURL = req.body.imageURL;
   const newProduct = new Product(null, title, imageURL, description, price);
-  newProduct.save();
-  res.redirect("/");
+  newProduct
+    .save()
+    .then(() => {
+      res.redirect("/");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 module.exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render("admin/view-product-admin", {
-      prods: products,
-      pageTitle: "Admin product",
-      path: "/admin/products",
+  Product.fetchAll()
+    .then((data) => {
+      res.render("admin/view-product-admin", {
+        prods: data[0],
+        pageTitle: "Admin product",
+        path: "/admin/products",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
     });
-  });
 };
