@@ -13,11 +13,12 @@
 // module.exports = pool.promise(); */
 
 // connect to mySQL database using sequelize:
-const Sequelize = require("sequelize");
+const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize("node-complete", "root", "yejiahao1234", {
   dialect: "mysql",
   host: "localhost",
+  port: "3301",
 });
 
 module.exports = sequelize;

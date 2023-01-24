@@ -1,4 +1,4 @@
-const fs = require("fs");
+/* const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
 
@@ -63,4 +63,37 @@ module.exports = class Product {
       }
     });
   }
-};
+}; */
+
+// create a product model using sequelize package
+const { Sequelize } = require("sequelize");
+
+const sequelize = require("../util/database");
+
+// define the product model:
+const Product = sequelize.define("products", {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  price: {
+    type: Sequelize.DOUBLE,
+    allowNull: false,
+  },
+  description: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
+  imageURL: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
+});
+
+module.exports = Product;
