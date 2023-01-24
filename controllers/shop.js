@@ -64,31 +64,10 @@ module.exports.getCart = (req, res, next) => {
     .catch((err) => {
       console.log(err);
     });
-
-  // const cartData = Cart.fetchCartItems();
-  // //console.log(cartData);
-  // Product.fetchAll((productsData) => {
-  //   const cartProducts = [];
-  //   for (let product of productsData) {
-  //     const cartProductData = cartData.products.find((prod) => {
-  //       return prod.id === product.id;
-  //     });
-  //     if (cartProductData) {
-  //       cartProducts.push({ productData: product, qty: cartProductData.qty });
-  //     }
-  //   }
-
-  //   res.render("shop/cart", {
-  //     pageTitle: "Your Cart",
-  //     path: "/cart",
-  //     products: cartProducts,
-  //   });
-  // });
 };
 
 module.exports.postItemToCart = async (req, res, next) => {
   const productId = req.body.productId;
-  console.log(req.body.productId);
 
   const findProduct = await Product.findById(productId);
   const productPrice = parseFloat(findProduct.price);
