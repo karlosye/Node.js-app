@@ -58,7 +58,7 @@ Product.belongsToMany(Cart, { through: CartItem });
 // user-order: 1-to-many ; order-product: many-to-many
 User.hasMany(Order);
 Order.belongsTo(User);
-Order.belongsToMany(Product, { through: OrderItem });sdafsdfsdfsdfsdfsdafsaf
+Order.belongsToMany(Product, { through: OrderItem });
 
 // init the database:
 sequelize
