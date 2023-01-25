@@ -32,6 +32,8 @@ const adminRoute = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const Cart = require("./models/cart");
 const CartItem = require("./models/cart-item");
+const Order = require("./models/order");
+const OrderItem = require("./models/order-item");
 
 app.use("/admin", adminRoute.routes);
 app.use(shopRoutes);
@@ -51,6 +53,12 @@ User.hasOne(Cart);
 Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+
+// define association btw user - order - product
+// user-order: 1-to-many ; order-product: many-to-many
+User.hasMany(Order);
+Order.belongsTo(User);
+Order.belongsToMany(Product, { through: OrderItem });
 
 // init the database:
 sequelize

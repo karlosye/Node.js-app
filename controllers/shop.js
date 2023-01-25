@@ -69,24 +69,65 @@ module.exports.getCart = (req, res, next) => {
 module.exports.postItemToCart = async (req, res, next) => {
   const productId = req.body.productId;
 
-  const findProduct = await Product.findById(productId);
-  const productPrice = parseFloat(findProduct.price);
+  try {
+    const cart = await req.user.getCart();
+    const productsSequelize = await cart.getProducts({
+      where: { id: productId },
+    });
 
-  Cart.addToCart(productId, productPrice);
+    const manageProductAndQty = async () => {
+      // if there exist items in cart
+      if (productsSequelize.length > 0) {
+        const items = productsSequelize[0];
+        const oldQuantity = items.cartItem.quantity;
+        const quantity = oldQuantity + 1;
 
-  res.redirect("/cart");
+        return { items, quantity };
+      } else {
+        const items = await Product.findByPk(productId);
+        return { items, quantity: 1 };
+      }
+    };
+
+    const { items, quantity } = await manageProductAndQty();
+    await cart.addProduct(items, { through: { quantity: quantity } });
+    await res.redirect("/cart");
+  } catch (error) {
+    console.log(error);
+  }
+
+  // const findProduct = await Product.findById(productId);
+  // const productPrice = parseFloat(findProduct.price);
+
+  // Cart.addToCart(productId, productPrice);
+
+  // res.redirect("/cart");
 };
 
-module.exports.postItemCartDelete = (req, res, next) => {
+// post request: delete an item from cart
+module.exports.postItemCartDelete = async (req, res, next) => {
   const productId = req.body.itemId;
-  const productPrice = req.body.itemPrice;
+  // const productPrice = req.body.itemPrice;
 
-  console.log(productId);
-  console.log(productPrice);
+  // Cart.deleteProductFromCart(productId, productPrice);
 
-  Cart.deleteProductFromCart(productId, productPrice);
+  // res.redirect("/cart");
 
-  res.redirect("/cart");
+  // delete the item from the in-between table:
+  req.user
+    .getCart()
+    .then((cart) => {
+      return cart.getProducts({ where: { id: productId } });
+    })
+    .then((products) => {
+      return products[0].cartItem.destroy();
+    })
+    .then((response) => {
+      res.redirect("/cart");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 module.exports.getCheckout = (req, res, next) => {
@@ -102,3 +143,7 @@ module.exports.getOrders = (req, res, next) => {
     path: "/checkout",
   });
 };
+
+module.exports.createOrder = (req,res,next) => {
+  
+}

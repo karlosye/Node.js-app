@@ -20,6 +20,9 @@ router.post("/cart", shopController.postItemToCart);
 router.get("/checkout", shopController.getCheckout);
 router.get("/orders", shopController.getOrders);
 
+// post request to create an order
+router.post("/create-order", shopController.createOrder)
+
 // delete item from cart:
 router.post("/delete-cart-item", shopController.postItemCartDelete);
 

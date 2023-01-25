@@ -9,16 +9,19 @@
                         <% for (let product of products) {%>
                             <li>
                                 <p>
-                                    <%= product.productData.title%> (<%= product.qty %>)
+                                    <%= product.title%> (<%= product.cartItem.quantity %>)
                                 </p>
                                 <form action="/delete-cart-item" method="POST">
-                                    <input type="hidden" value="<%= product.productData.price %>" name="itemPrice" />
-                                    <input type="hidden" value="<%= product.productData.id %>" name="itemId" />
+                                    <input type="hidden" value="<%= product.price %>" name="itemPrice" />
+                                    <input type="hidden" value="<%= product.id %>" name="itemId" />
                                     <button type="submit" class="btn">Delete</button>
                                 </form>
                             </li>
                             <% } %>
                     </ul>
+                    <form method="POST" action="/create-order">
+                        <button type="submit" class="btn">Order now</button>
+                    </form>
                     <% } else { %>
                         <h1>No products found in cart</h1>
                         <% } %>
