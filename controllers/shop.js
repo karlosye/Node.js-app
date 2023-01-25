@@ -138,12 +138,57 @@ module.exports.getCheckout = (req, res, next) => {
 };
 
 module.exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    pageTitle: "checkout page",
-    path: "/checkout",
-  });
+  req.user
+    .getOrders({ include: ["products"] })
+    .then((orders) => {
+      console.log("-----------------------------------------");
+      console.log(orders);
+      console.log("-----------------------------------------");
+      console.log(orders[0].products[0].orderItem);
+
+      res.render("shop/orders", {
+        pageTitle: "checkout page",
+        path: "/checkout",
+        orders: orders,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
-module.exports.createOrder = (req,res,next) => {
-  
-}
+// post shopping cart items into orders:
+module.exports.createOrder = (req, res, next) => {
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      // create an order from user
+      req.user
+        .createOrder()
+        .then((order) => {
+          return order.addProduct(
+            products.map((product) => {
+              product.orderItem = { quantity: product.cartItem.quantity };
+              return product;
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
+    .then((result) => {
+      return fetchedCart.setProducts(null);
+    })
+    .then((result) => {
+      res.redirect("/orders");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
